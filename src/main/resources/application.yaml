@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: RateLimiter
+  security:
+    user:
+      name: user
+      password: password
