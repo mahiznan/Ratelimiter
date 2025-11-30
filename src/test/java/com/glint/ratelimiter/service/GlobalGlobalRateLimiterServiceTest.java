@@ -9,14 +9,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class RateLimiterServiceTest {
+class GlobalGlobalRateLimiterServiceTest {
 
-    private RateLimiterService rateLimiter;
+    private GlobalRateLimiterService rateLimiter;
 
     @BeforeEach
     void setup() {
-        this.rateLimiter = new RateLimiterService();
-        rateLimiter.updateConfig(1001, 1.0);
+        this.rateLimiter = new GlobalRateLimiterService();
+        rateLimiter.updateConfig(5, 1.0);
     }
 
     @Test
@@ -103,6 +103,7 @@ class RateLimiterServiceTest {
 
     @Test
     void testTryAcquirePerformanceUnder5ms() {
+        rateLimiter.updateConfig(1001, 1);
         // Warm up JVM (important for stable perf tests)
         for (int i = 0; i < 1000; i++) {
             rateLimiter.tryAcquire();
@@ -123,6 +124,7 @@ class RateLimiterServiceTest {
 
     @Test
     void testConcurrentRequests() throws InterruptedException {
+        rateLimiter.updateConfig(1000, 1);
         int THREAD_COUNT = 1000;
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_COUNT);
         AtomicInteger successCount = new AtomicInteger(0);
@@ -150,8 +152,8 @@ class RateLimiterServiceTest {
         long minTime = executionTimes.stream().mapToLong(Long::longValue).min().orElse(0);
         long maxTime = executionTimes.stream().mapToLong(Long::longValue).max().orElse(0);
         double averageTime = executionTimes.stream().mapToLong(Long::longValue).average().orElse(0.0);
-        System.out.printf("Min time (ms): %d, Max time (ms): %d%n", minTime, maxTime);
-        System.out.printf("Average time (ms): %.2f%n", averageTime);
+        System.out.printf("Min time (µs): %d, Max time (µs): %d%n", minTime, maxTime);
+        System.out.printf("Average time (µs): %.2f%n", averageTime);
         System.out.println("Success count: " + successCount + ", Failure count: " + failureCount);
         assertEquals(THREAD_COUNT, successCount.get());
         assertEquals(0, failureCount.get());

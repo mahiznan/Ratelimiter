@@ -1,10 +1,12 @@
 package com.glint.ratelimiter.controller;
 
-import com.glint.ratelimiter.service.RateLimiterService;
+import com.glint.ratelimiter.config.SecurityConfig;
+import com.glint.ratelimiter.service.UserRateLimiterService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -15,11 +17,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(MovieController.class)
-@Import(RateLimiterService.class)
+@WebMvcTest({MovieController.class, RateLimiterController.class})
+@Import({UserRateLimiterService.class, SecurityConfig.class})
 class MovieControllerTest {
 
     private static final int THREAD_COUNT = 100;
@@ -28,8 +30,10 @@ class MovieControllerTest {
     private MockMvc mockMvc;
 
 
+
+
     @Test
-    void testConcurrentGetTopMovies() throws InterruptedException {
+    void testConcurrentGetTopMovies() throws Exception {
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_COUNT);
         CountDownLatch latch = new CountDownLatch(THREAD_COUNT);
         Queue<Long> executionTimes = new ConcurrentLinkedQueue<>();
@@ -39,12 +43,26 @@ class MovieControllerTest {
 
         List<Future<?>> futures = new ArrayList<>();
 
+        mockMvc.perform(post("/ratelimiter/update")
+                        .with(httpBasic("user", "password"))
+                        .header("User-Id", "rajesh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "userId": "rajesh",
+                                  "capacity": 100,
+                                  "refillRatePerSecond": 1.0
+                                }
+                                """))
+                .andExpect(status().isOk());
+
         for (int i = 0; i < THREAD_COUNT; i++) {
             futures.add(executorService.submit(() -> {
                 long start = System.nanoTime();
                 try {
-                    mockMvc.perform(get("/movies/top/5")
-                                    .with(httpBasic("user", "password")))
+                    mockMvc.perform(post("/movies/top/5")
+                                    .with(httpBasic("user", "password"))
+                                    .header("User-Id", "rajesh"))
                             .andExpect(status().isOk());
                     successCount.incrementAndGet();
                 } catch (Exception e) {

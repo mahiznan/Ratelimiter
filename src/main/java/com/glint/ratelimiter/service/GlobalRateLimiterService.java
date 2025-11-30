@@ -5,14 +5,14 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
-public class RateLimiterService implements RateLimiter {
+public class GlobalRateLimiterService implements GlobalRateLimiter {
     private final AtomicLong tokens = new AtomicLong();
 
     private double refillRatePerSecond = 1.0;
     private long capacity = 5;
     private final AtomicLong lastRefillTime = new AtomicLong(System.nanoTime());
 
-    public RateLimiterService() {
+    public GlobalRateLimiterService() {
         tokens.set(capacity);
     }
 

@@ -2,10 +2,7 @@ package com.glint.ratelimiter.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -15,7 +12,7 @@ import java.util.stream.Stream;
 public class MovieController {
     private static final Logger log = LoggerFactory.getLogger(MovieController.class);
 
-    @GetMapping("/top/{count}")
+    @PostMapping("/top/{count}")
     public List<Movie> getTop(@PathVariable int count) {
         return Stream.of(
                 new Movie(1, "The Shawshank Redemption", 1994, "tt0111161"),
