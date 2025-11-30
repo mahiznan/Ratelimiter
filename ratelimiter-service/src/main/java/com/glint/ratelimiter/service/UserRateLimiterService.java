@@ -13,7 +13,7 @@ public class UserRateLimiterService implements UserRateLimiter {
 
     private final long capacity;
 
-    public UserRateLimiterService(@Value("${glint.ratelimiter.refillRatePerSecond}") long refillRatePerSecond, @Value("${glint.ratelimiter.capacity}") long capacity) {
+    public UserRateLimiterService(@Value("${glint.ratelimiter.capacity}") long capacity, @Value("${glint.ratelimiter.refillRatePerSecond}") long refillRatePerSecond) {
         this.refillRatePerSecond = refillRatePerSecond;
         this.capacity = capacity;
     }

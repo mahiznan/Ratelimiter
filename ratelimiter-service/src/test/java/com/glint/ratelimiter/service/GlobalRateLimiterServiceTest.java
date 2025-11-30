@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GlobalGlobalRateLimiterServiceTest {
+class GlobalRateLimiterServiceTest {
 
     private GlobalRateLimiterService rateLimiter;
 
