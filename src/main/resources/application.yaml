@@ -1,3 +1,4 @@
+
 spring:
   application:
     name: RateLimiter
@@ -5,3 +6,10 @@ spring:
     user:
       name: user
       password: password
+logging:
+  level:
+    org.springframework.security: INFO
+    org.springframework.web.filter: INFO
+server:
+  servlet:
+    context-path: /api
