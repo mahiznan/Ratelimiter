@@ -8,7 +8,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>ratelimiter-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
     <name>RateLimiter Service</name>
     <description>RateLimiter</description>
     <url/>
